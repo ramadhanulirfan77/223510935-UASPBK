@@ -1,15 +1,14 @@
-<!-- App.vue -->
 <template>
   <div class="app-container">
     <h1 class="welcome-text">Selamat Datang di Website Danul</h1>
     <nav>
       <ul>
-        <li @click="selectedMenu = 'todos'" :class="{ active: selectedMenu === 'todos' }">Todos</li>
-        <li @click="selectedMenu = 'posts'" :class="{ active: selectedMenu === 'posts' }">Posts</li>
+        <li @click="selectMenu('todos')" :class="{ active: selectedMenu === 'todos' }">Todos</li>
+        <li @click="selectMenu('posts')" :class="{ active: selectedMenu === 'posts' }">Posts</li>
       </ul>
     </nav>
     <div class="content">
-      <todos v-if="selectedMenu === 'todos'" />
+      <todos v-if="selectedMenu === 'todos'" @removeTodo="removeTodo" />
       <post v-if="selectedMenu === 'posts'" />
     </div>
   </div>
@@ -26,9 +25,16 @@ export default {
   },
   data() {
     return {
-      selectedMenu: '', // Memilih menu aktif: 'todos' atau 'posts'
+      selectedMenu: '', 
     };
   },
+  methods: {
+    selectMenu(menu) {
+      this.selectedMenu = menu;
+    },
+    removeTodo() {
+    }
+  }
 };
 </script>
 

@@ -1,13 +1,12 @@
 <template>
   <div class="background">
-    <h1>Users</h1>
-    <select v-model="selectedUser">
-      <option v-for="user in users" :key="user.id" :value="user.id">
-        {{ user.name }}
-      </option>
+    <select v-model="selectedUser" @change="getPosts">
+      <option value="">Pilih Pengguna</option>
+      <option v-for="user in users" :key="user.id" :value="user.id">{{ user.name }}</option>
     </select>
+
     <div v-if="isLoading">Loading posts...</div>
-    <div v-else>
+    <div v-else-if="selectedUser !== ''">
       <h2>Posts</h2>
       <ul>
         <li v-for="post in posts" :key="post.id" class="post-item">
@@ -16,40 +15,44 @@
         </li>
       </ul>
     </div>
+    <div v-else>
+      <p>Silakan pilih pengguna terlebih dahulu.</p>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, defineEmits } from 'vue';
 
-const users = ref([]);
+const { emit } = defineEmits();
+
 const posts = ref([]);
-const selectedUser = ref(null);
 const isLoading = ref(false);
+const selectedUser = ref('');
+const users = ref([]);
 
 const getUsers = async () => {
-  const resource = "https://jsonplaceholder.typicode.com/users";
-  const response = await fetch(resource);
+  const response = await fetch('https://jsonplaceholder.typicode.com/users');
   users.value = await response.json();
 };
 
 const getPosts = async () => {
-  if (selectedUser.value !== null) {
+  if (selectedUser.value !== '') {
     posts.value = [];
     isLoading.value = true;
     const response = await fetch(`https://jsonplaceholder.typicode.com/posts?userId=${selectedUser.value}`);
     posts.value = await response.json();
     isLoading.value = false;
+    emit('postsLoaded');
   }
 };
 
-getUsers();
-
 watch(selectedUser, getPosts);
+
+getUsers();
 </script>
 
 <style scoped>
-/* CSS untuk pembungkus utama */
 .background {
   background-image: url(image/bgr.jpg);
   background-repeat: no-repeat;
@@ -66,26 +69,6 @@ watch(selectedUser, getPosts);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Styling untuk heading */
-h1, h2 {
-  margin: 0;
-  padding: 10px;
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 10px;
-  text-align: center;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-}
-
-h3 {
-  margin: 0;
-  padding: 10px;
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 5px;
-  text-align: center;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-}
-
-/* Styling untuk select dropdown */
 select {
   padding: 10px;
   width: 300px;
@@ -97,7 +80,6 @@ select {
   cursor: pointer;
 }
 
-/* Styling untuk ul dan li */
 ul {
   list-style-type: none;
   padding: 0;
@@ -128,7 +110,6 @@ li p {
   padding: 0;
 }
 
-/* Styling untuk loading text */
 div[if="isLoading"] {
   margin-top: 20px;
   font-size: 18px;
