@@ -5,16 +5,20 @@
       <ul>
         <li @click="selectMenu('todos')" :class="{ active: selectedMenu === 'todos' }">Todos</li>
         <li @click="selectMenu('posts')" :class="{ active: selectedMenu === 'posts' }">Posts</li>
+        <li @click="navigateTo('album')" :class="{ active: selectedMenu === 'album' }">Albums</li>
       </ul>
     </nav>
     <div class="content">
       <todos v-if="selectedMenu === 'todos'" @removeTodo="removeTodo" />
       <post v-if="selectedMenu === 'posts'" />
+      <router-view v-if="selectedMenu === 'album'"/>
     </div>
   </div>
 </template>
 
 <script>
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 import todos from './components/todos.vue';
 import post from './components/post.vue';
 
@@ -23,17 +27,29 @@ export default {
     todos,
     post,
   },
-  data() {
-    return {
-      selectedMenu: '', 
+  setup() {
+    const router = useRouter();
+    const selectedMenu = ref('');
+
+    const selectMenu = (menu) => {
+      selectedMenu.value = menu;
     };
-  },
-  methods: {
-    selectMenu(menu) {
-      this.selectedMenu = menu;
-    },
-    removeTodo() {
-    }
+
+    const navigateTo = (route) => {
+      selectedMenu.value = route;
+      router.push(`/${route}`);
+    };
+
+    const removeTodo = () => {
+      // Implementasi logika removeTodo jika diperlukan
+    };
+
+    return {
+      selectedMenu,
+      selectMenu,
+      navigateTo,
+      removeTodo
+    };
   }
 };
 </script>
